@@ -36,7 +36,10 @@ REPORTS = {
 
 
 def load_data(files: List[str]) -> Dict[str, List[float]]:
-    
+    """
+    Читает CSV-файлы и возвращает словарь:
+    студент -> список трат на кофе (coffee_spent).
+    """
     data = {}
     for file_path in files:
         try:
@@ -57,8 +60,13 @@ def load_data(files: List[str]) -> Dict[str, List[float]]:
                         continue
                     data.setdefault(student, []).append(coffee)
         except FileNotFoundError:
+            
             raise FileNotFoundError(f"Файл не найден: {file_path}")
+        except ValueError:
+            
+            raise
         except Exception as e:
+            
             raise RuntimeError(f"Ошибка при чтении файла {file_path}: {e}")
     return data
 

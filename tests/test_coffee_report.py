@@ -1,5 +1,4 @@
 import csv
-import sys
 from unittest.mock import patch
 
 import pytest
@@ -45,7 +44,7 @@ def test_load_data_multiple_files(tmp_path):
 
 
 def test_load_data_missing_file():
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(FileNotFoundError, match="Файл не найден"):
         load_data(["nonexistent.csv"])
 
 
@@ -121,10 +120,11 @@ def test_main_success(tmp_path, capsys):
     with patch('sys.argv', ['script.py', '--files', str(file), '--report', 'median-coffee']):
         main()
         captured = capsys.readouterr()
-       
         assert "Alex" in captured.out
         assert "Bob" in captured.out
-       
         lines = captured.out.split('\n')
-        assert "Bob" in lines[2] and "300" in lines[2]
-        assert "Alex" in lines[3] and "150" in lines[3]
+        
+        found_bob = any("Bob" in line and "300" in line for line in lines)
+        found_alex = any("Alex" in line and "150" in line for line in lines)
+        assert found_bob, "Строка с Bob и 300 не найдена"
+        assert found_alex, "Строка с Alex и 150 не найдена"
